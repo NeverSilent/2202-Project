@@ -122,15 +122,27 @@ boolean btToggle = true;
 int iButtonState;
 int iLastButtonState = HIGH;
 
-unsigned long prevMicrosec = 0;               // start time for delay cycle, in milliseconds
-unsigned long currMicrosec = 0;                // current time, in milliseconds
-unsigned long stepCount = 0;                  // number of steps
-unsigned long stepRate = 0;                       // step rate in microseconds  
-const int dirPin = 21; // SDA 
-const int stepPin = 22; //SCLK
-boolean directionHold = true;
-boolean raiseFlag = false;
-boolean lowerFlag = false;
+//first stepper motor
+unsigned long prevMicrosec1 = 0;               // start time for delay cycle, in milliseconds
+unsigned long currMicrosec1 = 0;                // current time, in milliseconds
+unsigned long stepCount1 = 0;                  // number of steps
+unsigned long stepRate1 = 0;                       // step rate in microseconds  
+const int dirPin1 = 21; // SDA 
+const int stepPin1 = 22; //SCLK
+boolean directionHold1 = true;
+boolean raiseFlag1 = false;
+boolean lowerFlag1 = false;
+
+//second stepper motor
+unsigned long prevMicrosec2 = 0;               // start time for delay cycle, in milliseconds
+unsigned long currMicrosec2 = 0;                // current time, in milliseconds
+unsigned long stepCount2 = 0;                  // number of steps
+unsigned long stepRate2 = 0;                       // step rate in microseconds  
+const int dirPin2 = 15; // silk 15 
+const int stepPin2 = 23; // silk 23
+boolean directionHold2 = true;
+boolean raiseFlag2 = false;
+boolean lowerFlag2 = false;
 
 // Declare our SK6812 SMART LED object:
 Adafruit_NeoPixel SmartLEDs(2, 25, NEO_GRB + NEO_KHZ400);
@@ -170,11 +182,19 @@ void setup() {
    pinMode(ciPB1, INPUT_PULLUP);
    pinMode(ciLimitSwitch, INPUT_PULLUP);
 
-   pinMode(dirPin, OUTPUT);
-   pinMode(stepPin, OUTPUT);
+   //first motor
+   pinMode(dirPin1, OUTPUT);
+   pinMode(stepPin1, OUTPUT);
 
-    ledcAttachPin(stepPin, 10);     // Assign servo pin to servo channel
-   ledcSetup(10, 589, 8);           // setup for channel for 589 Hz, 8-bit resolution
+   ledcAttachPin(stepPin1, 10);     // Assign servo pin to servo channel
+   ledcSetup(10, 589, 8);          // setup for channel for 589 Hz, 8-bit resolution
+
+   //second motor
+   pinMode(dirPin2, OUTPUT);
+   pinMode(stepPin2, OUTPUT);
+
+   ledcAttachPin(stepPin2, 11);     // Assign servo pin to servo channel
+   ledcSetup(11, 589, 8);          // setup for channel for 589 Hz, 8-bit resolution
 
    SmartLEDs.begin();                          // Initialize Smart LEDs object (required)
    SmartLEDs.clear();                          // Set all pixel colours to off
@@ -512,27 +532,48 @@ void loop()
  }
  }
  
- if(raiseFlag == true){
-      digitalWrite(dirPin, directionHold);
-      currMicrosec = micros();                      // get the current time in milliseconds
+ if(raiseFlag1 == true){
+      digitalWrite(dirPin1, directionHold1);
+      currMicrosec1 = micros();                      // get the current time in milliseconds
         
-          if (currMicrosec - prevMicrosec > 300) { // check to see if elapsed time matched the desired delay
-          prevMicrosec = currMicrosec;           
-          stepCount++;
-          digitalWrite(stepPin, stepCount & 1);  // toggle step pin (0 if stepCount is even, 1 if stepCount is odd)
+          if (currMicrosec1 - prevMicrosec1 > 300) { // check to see if elapsed time matched the desired delay
+          prevMicrosec1 = currMicrosec1;           
+          stepCount1++;
+          digitalWrite(stepPin1, stepCount1 & 1);  // toggle step pin (0 if stepCount is even, 1 if stepCount is odd)
           }     
         
  }
- if(lowerFlag == true){
-      digitalWrite(dirPin, !(directionHold)); 
+ if(lowerFlag1 == true){
+      digitalWrite(dirPin1, !(directionHold1)); 
       currMicrosec = micros();                      // get the current time in milliseconds
         
-          if (currMicrosec - prevMicrosec > 300) { // check to see if elapsed time matched the desired delay
-          prevMicrosec = currMicrosec;           
-          stepCount++;
-          digitalWrite(stepPin, stepCount & 1);  // toggle step pin (0 if stepCount is even, 1 if stepCount is odd)
+          if (currMicrosec1 - prevMicrosec1 > 300) { // check to see if elapsed time matched the desired delay
+          prevMicrosec1 = currMicrosec1;           
+          stepCount1++;
+          digitalWrite(stepPin1, stepCount1 & 1);  // toggle step pin (0 if stepCount is even, 1 if stepCount is odd)
           }  
       }
+}
 
- 
+if(raiseFlag2 == true){
+      digitalWrite(dirPin2, directionHold2);
+      currMicrosec2 = micros();                      // get the current time in milliseconds
+        
+          if (currMicrosec2 - prevMicrosec2 > 300) { // check to see if elapsed time matched the desired delay
+          prevMicrosec2 = currMicrosec2;           
+          stepCount2++;
+          digitalWrite(stepPin2, stepCount2 & 1);  // toggle step pin (0 if stepCount is even, 1 if stepCount is odd)
+          }     
+        
+ }
+ if(lowerFlag2 == true){
+      digitalWrite(dirPin2, !(directionHold2)); 
+      currMicrosec = micros();                      // get the current time in milliseconds
+        
+          if (currMicrosec2 - prevMicrosec2 > 300) { // check to see if elapsed time matched the desired delay
+          prevMicrosec2 = currMicrosec2;           
+          stepCount2++;
+          digitalWrite(stepPin2, stepCount2 & 1);  // toggle step pin (0 if stepCount is even, 1 if stepCount is odd)
+          }  
+      }
 }
