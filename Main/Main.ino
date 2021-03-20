@@ -283,6 +283,8 @@ void loop()
             move(0);
             break;
           }
+
+          //cae 1 to 5 is the course around the obstacle
           case 1:
           {
             CR1_ciMotorRunTime = 2000; //set the time allocated for each case to 2 sec
@@ -316,15 +318,15 @@ void loop()
 
           case 4:
           {
-            ENC_SetDistance(-38, 38); //go right a bit
-            ucMotorState = 3; //right
+            ENC_SetDistance(38, -38); //go left a bit
+            ucMotorState = 2; //left
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
             ucMotorStateIndex = 5;
             break;
           }
          
-          case 5:
+          /*case 5:
           {
             ENC_SetDistance(455, 455); //go forward a bit
             ucMotorState = 1; //forward
@@ -332,29 +334,10 @@ void loop()
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
             ucMotorStateIndex = 6;
             break;
-          }
+          }*/
+
           
-          case 6:
-          {
-            ENC_SetDistance(-50, 50); //go right a bit
-            ucMotorState = 3; //right
-            CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
-            CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
-            ucMotorStateIndex = 7;
-            break;
-          }
-          
-          case 7:
-          {
-            ENC_SetDistance(560, 560); //go forward a bit
-            ucMotorState = 1; //forward
-            CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
-            CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
-            ucMotorStateIndex = 8;
-            break;
-          }
-          
-           case 8:
+          case 5:
           {
             CR1_ciMotorRunTime = 600; //set the time allocated for each case to 300 mili sec
             if(CR1_ui8IRDatum == 0x55){
@@ -373,53 +356,35 @@ void loop()
             }
             break;
           }
-            case 9:
-          {
-            CR1_ciMotorRunTime = 2000; //set the time allocated for each case to 2 sec
-            ENC_SetDistance(152, 152); //go back half the distance: 1 meter
-            ucMotorState = 4; //reverse
-            CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
-            CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
-            ucMotorStateIndex = 10;
-            break;    
-          }
-            case 10:
-          {
-            ENC_SetDistance(96, -96); //turn 180 degrees, 90 degrees was 30 ticks
-            ucMotorState = 2; //left
-            CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
-            CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
-            ucMotorStateIndex = 11;
-            break; 
-          }
-            case 11:
-            {
-              
-              ledcWrite(2,255);
-              ledcWrite(1,255);
-              ledcWrite(4,255);
-              ledcWrite(3,255);
-              CR1_ciMotorRunTime = 3000; //set the time allocated for each case to 2 sec
 
-             digitalWrite(dirPin, 1);
-             ledcWrite(10, 128);  // set the desired 
+         //case 6 to 7 to run the steppers up the rope
+          case 6:
+          {
+              
+             ledcWrite(2,255);
+             ledcWrite(1,255);
+             ledcWrite(4,255);
+             ledcWrite(3,255);
+             CR1_ciMotorRunTime = 3000; //set the time allocated for each case to 2 sec
+
+             digitalWrite(dirPin1, 1);
+             ledcWrite(10, 128);  
              
-             ucMotorStateIndex = 12;
+             digitalWrite(dirPin2, 0);
+             ledcWrite(11, 128);   
+             
+             ucMotorStateIndex = 7;
              break;
             }
+                  
+            case 7:
+            {
+             
+             ledcWrite(10, 0);
 
-            case 12:
-            {
-             digitalWrite(dirPin, 0);
-             ledcWrite(10, 128);  // set the desired                              
-              ucMotorStateIndex = 13;
-             break;
+             ledcWrite(11, 0);
+
             
-            }      
-            case 13:
-            {
-             digitalWrite(dirPin, 0);
-             ledcWrite(10, 0);  // set the desired                              
              break;
             }
 
@@ -491,7 +456,7 @@ void loop()
        else if (CR1_ui8IRDatum == 0x41) {           // if "hit" character is seen
          SmartLEDs.setPixelColor(0,25,0,25);        // make LED1 purple with 10% intensity
          if(reverseSet == 0){
-          ucMotorStateIndex = 9; //start to back up and such
+          ucMotorStateIndex = 6; //start to climb
           reverseSet = 1;
          }
        }
@@ -531,7 +496,8 @@ void loop()
    // Serial.println((vui32test2 - vui32test1)* 3 );
  }
  }
- 
+
+ /* for precise timeing thaat isn't needed
  if(raiseFlag1 == true){
       digitalWrite(dirPin1, directionHold1);
       currMicrosec1 = micros();                      // get the current time in milliseconds
@@ -577,3 +543,4 @@ if(raiseFlag2 == true){
           }  
       }
 }
+*/
