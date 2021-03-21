@@ -288,7 +288,7 @@ void loop()
           case 1:
           {
             CR1_ciMotorRunTime = 2000; //set the time allocated for each case to 2 sec
-            ENC_SetDistance(190, 190); //go forward a bit
+            ENC_SetDistance(177, 177); //go forward a bit
             ucMotorState = 1; //forward
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -298,7 +298,7 @@ void loop()
           
           case 2:
           {
-            ENC_SetDistance(5, -5); //go left a bit
+            ENC_SetDistance(33, -33); //go left a bit
             ucMotorState = 2; //left
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -308,7 +308,7 @@ void loop()
           
           case 3:
           {
-            ENC_SetDistance(210, 210); //go forward a bit
+            ENC_SetDistance(318, 318); //go forward a bit
             ucMotorState = 1; //forward
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -318,7 +318,7 @@ void loop()
 
           case 4:
           {
-            ENC_SetDistance(8, -8); //go left a bit
+            ENC_SetDistance(26, -26); //go left a bit
             ucMotorState = 2; //left
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -339,7 +339,7 @@ void loop()
           
           case 5:
           {
-            CR1_ciMotorRunTime = 600; //set the time allocated for each case to 300 mili sec
+            CR1_ciMotorRunTime = 400; //set the time allocated for each case to 300 mili sec
             if(CR1_ui8IRDatum == 0x55){
               ENC_SetDistance(95, 95); //135 for 1 foot, 3 feet to a meter, x 2 meters + a bit for caution
               //^^^ doesn't actually matter if the correction step is called
@@ -348,7 +348,7 @@ void loop()
               CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
               CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed; 
             } else if((CR1_ui8IRDatum != 0x55)&&(CR1_ui8IRDatum != 0x41)){
-              ENC_SetDistance(7, -7); //turn a bit more than 360 degrees, for correcting path
+              ENC_SetDistance(4, -4); //turn a bit more than 360 degrees, for correcting path
               //changed to 15 degrees for shorter run times and adjustment
               ucMotorState = 2; //left
               CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
@@ -421,8 +421,8 @@ void loop()
       if(ENC_ISMotorRunning())
       {
         //RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster)
-        MoveTo(ucMotorState, LeftAdjust(CR1_ui8LeftWheelSpeed, CR1_ui8Adjuster) - 20, RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster) + 15);
-      }
+        MoveTo(ucMotorState, LeftAdjust(CR1_ui8LeftWheelSpeed, CR1_ui8Adjuster) , RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster) + 17);
+      } 
    
       CR1_ucMainTimerCaseCore1 = 4;
       break;
