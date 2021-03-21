@@ -496,6 +496,7 @@ void loop()
    // Serial.println((vui32test2 - vui32test1)* 3 );
  }
  }
+}
 
  /* for precise timeing thaat isn't needed
  if(raiseFlag1 == true){
