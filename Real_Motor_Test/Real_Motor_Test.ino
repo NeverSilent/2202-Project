@@ -1,8 +1,10 @@
-const int ciMotorLeftA = 4;
-const int ciMotorLeftB = 18;
-const int ciMotorRightA = 19;
-const int ciMotorRightB = 12;
+#define ciMotorLeftA 4
+#define ciMotorLeftB 18
+#define ciMotorRightA 19
+#define ciMotorRightB 12
+#define pot A4
 
+int WheelSpeed;
 
 void setup() {
   // put your setup code here, to run once:
@@ -18,8 +20,17 @@ void setup() {
 }
 
 void loop() {
-  ledcWrite(1, 250);
-  ledcWrite(2, 0);
-  ledcWrite(3, 250);
-  ledcWrite(4, 0);
+  WheelSpeed = map(analogRead(pot), 0, 4096, 130, 255);
+  
+  if(WheelSpeed >= 135){
+    ledcWrite(1, WheelSpeed);
+    ledcWrite(2, 0);
+    ledcWrite(3, WheelSpeed);
+    ledcWrite(4, 0);
+  } else {
+    ledcWrite(1, 0);
+    ledcWrite(2, 0);
+    ledcWrite(3, 0);
+    ledcWrite(4, 0);    
+  }
 }
