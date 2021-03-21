@@ -330,7 +330,7 @@ void loop()
       if(ENC_ISMotorRunning())
       {
         //RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster)
-        MoveTo(ucMotorState, LeftAdjust(CR1_ui8LeftWheelSpeed - 25, CR1_ui8Adjuster), RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster)+10);
+        MoveTo(ucMotorState, LeftAdjust(CR1_ui8LeftWheelSpeed, CR1_ui8Adjuster), RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster));
       }
    
       CR1_ucMainTimerCaseCore1 = 4;
