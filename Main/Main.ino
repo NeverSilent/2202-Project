@@ -288,7 +288,7 @@ void loop()
           case 1:
           {
             CR1_ciMotorRunTime = 2000; //set the time allocated for each case to 2 sec
-            ENC_SetDistance(240, 240); //go forward a bit
+            ENC_SetDistance(190, 190); //go forward a bit
             ucMotorState = 1; //forward
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -298,7 +298,7 @@ void loop()
           
           case 2:
           {
-            ENC_SetDistance(25, -25); //go left a bit
+            ENC_SetDistance(5, -5); //go left a bit
             ucMotorState = 2; //left
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -308,7 +308,7 @@ void loop()
           
           case 3:
           {
-            ENC_SetDistance(233, 233); //go forward a bit
+            ENC_SetDistance(210, 210); //go forward a bit
             ucMotorState = 1; //forward
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -318,7 +318,7 @@ void loop()
 
           case 4:
           {
-            ENC_SetDistance(38, -38); //go left a bit
+            ENC_SetDistance(8, -8); //go left a bit
             ucMotorState = 2; //left
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -421,7 +421,7 @@ void loop()
       if(ENC_ISMotorRunning())
       {
         //RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster)
-        MoveTo(ucMotorState, LeftAdjust(CR1_ui8LeftWheelSpeed - 25, CR1_ui8Adjuster), RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster)+10);
+        MoveTo(ucMotorState, LeftAdjust(CR1_ui8LeftWheelSpeed, CR1_ui8Adjuster) - 20, RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster) + 15);
       }
    
       CR1_ucMainTimerCaseCore1 = 4;
