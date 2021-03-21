@@ -278,6 +278,7 @@ void loop()
          {
           case 0: //time to get away
           {
+            CR1_ciMotorRunTime = 50; //set the time allocated for each case to 2 sec
             ucMotorStateIndex = 1;
             ucMotorState = 0;
             move(0);
@@ -288,11 +289,11 @@ void loop()
           case 1:
           {
             CR1_ciMotorRunTime = 12000; //set the time allocated for each case to 2 sec
-            ENC_SetDistance(240, 240); //go forward a bit
+            ENC_SetDistance(9240, 9240); //go forward a bit
             ucMotorState = 1; //forward
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
-            ucMotorStateIndex = 1;
+            ucMotorStateIndex = 0;
             break;
           }
 
