@@ -123,17 +123,17 @@ int iButtonState;
 int iLastButtonState = HIGH;
 
 //first stepper motor
-unsigned long prevMicrosec1 = 0;               // start time for delay cycle, in milliseconds
-unsigned long currMicrosec1 = 0;                // current time, in milliseconds
-unsigned long stepCount1 = 0;                  // number of steps
-unsigned long stepRate1 = 0;                       // step rate in microseconds  
-const int dirPin1 = 21; // SDA 
-const int stepPin1 = 22; //SCLK
-boolean directionHold1 = true;
-boolean raiseFlag1 = false;
-boolean lowerFlag1 = false;
+//unsigned long prevMicrosec1 = 0;               // start time for delay cycle, in milliseconds
+//unsigned long currMicrosec1 = 0;                // current time, in milliseconds
+//unsigned long stepCount1 = 0;                  // number of steps
+//unsigned long stepRate1 = 0;                       // step rate in microseconds  
+const int Gear1 = 21;              //SDA 
+const int Gear2 = 22;              //SCLK
+//boolean directionHold1 = true;
+//boolean raiseFlag1 = false;
+//boolean lowerFlag1 = false;
 
-//second stepper motor
+/*second stepper motor
 unsigned long prevMicrosec2 = 0;               // start time for delay cycle, in milliseconds
 unsigned long currMicrosec2 = 0;                // current time, in milliseconds
 unsigned long stepCount2 = 0;                  // number of steps
@@ -143,6 +143,7 @@ const int stepPin2 = 23; // silk 23
 boolean directionHold2 = true;
 boolean raiseFlag2 = false;
 boolean lowerFlag2 = false;
+*/
 
 // Declare our SK6812 SMART LED object:
 Adafruit_NeoPixel SmartLEDs(2, 25, NEO_GRB + NEO_KHZ400);
@@ -182,19 +183,22 @@ void setup() {
    pinMode(ciPB1, INPUT_PULLUP);
    pinMode(ciLimitSwitch, INPUT_PULLUP);
 
-   //first motor
-   pinMode(dirPin1, OUTPUT);
-   pinMode(stepPin1, OUTPUT);
+   //set the pind to output the planataries
+   pinMode(Gear1, OUTPUT);
+   pinMode(Gear2, OUTPUT);
 
-   ledcAttachPin(stepPin1, 10);     // Assign servo pin to servo channel
-   ledcSetup(10, 589, 8);          // setup for channel for 589 Hz, 8-bit resolution
+   ledcAttachPin(Gear1, 10);         // Assign servo pin to servo channel
+   ledcSetup(10, 21000, 8);          // setup for channel for 21000 Hz, 8-bit resolution
+
+   ledcAttachPin(Gear2, 11);         // Assign servo pin to servo channel
+   ledcSetup(11, 21000, 8);          // setup for channel for 21000 Hz, 8-bit resolution
 
    //second motor
-   pinMode(dirPin2, OUTPUT);
-   pinMode(stepPin2, OUTPUT);
+   //pinMode(dirPin2, OUTPUT);
+   //pinMode(stepPin2, OUTPUT);
 
-   ledcAttachPin(stepPin2, 11);     // Assign servo pin to servo channel
-   ledcSetup(11, 589, 8);          // setup for channel for 589 Hz, 8-bit resolution
+   //ledcAttachPin(stepPin2, 11);     // Assign servo pin to servo channel
+   //ledcSetup(11, 589, 8);          // setup for channel for 589 Hz, 8-bit resolution
 
    SmartLEDs.begin();                          // Initialize Smart LEDs object (required)
    SmartLEDs.clear();                          // Set all pixel colours to off
@@ -365,13 +369,13 @@ void loop()
              ledcWrite(1,255);
              ledcWrite(4,255);
              ledcWrite(3,255);
-             CR1_ciMotorRunTime = 12000; //set the time allocated for each case to 2 sec
+             CR1_ciMotorRunTime = 120000; //set the time allocated for each case to 2 sec
 
-             digitalWrite(dirPin1, 1);
-             ledcWrite(10, 128);  
+             //digitalWrite(dirPin1, 1);
+             ledcWrite(10, 255);  
              
-             digitalWrite(dirPin2, 0);
-             ledcWrite(11, 128);   
+             //digitalWrite(dirPin2, 0);
+             ledcWrite(11, 255);   
              
              ucMotorStateIndex = 7;
              break;
