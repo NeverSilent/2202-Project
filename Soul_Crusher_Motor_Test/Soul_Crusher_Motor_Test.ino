@@ -1,7 +1,7 @@
 #define servoLeft 25
 #define servoRight 23
 
-#define yellowLeftA 18
+#define yellowLeftA 26
 #define yellowLeftB 4
 #define yellowRightA 21
 #define yellowRightB 22
@@ -33,15 +33,15 @@ void setup() {
 void loop() {
   WheelSpeed = map(analogRead(pot1), 0, 4096, 130, 255);
   ServoPos = map(analogRead(pot2), 0, 4096, 0, 60);
-  
+
+  ledcWrite(5, DDP(ServoPos));
+  ledcWrite(6, DDP(ServoPos));
   
   if(WheelSpeed >= 135){ //make a zone of full stop
     ledcWrite(1, WheelSpeed);
     ledcWrite(2, 0);
     ledcWrite(3, WheelSpeed);
     ledcWrite(4, 0);
-    ledcWrite(5, DDP(ServoPos));
-    ledcWrite(6, DDP(ServoPos));
     
   } else {
     ledcWrite(1, 0);
