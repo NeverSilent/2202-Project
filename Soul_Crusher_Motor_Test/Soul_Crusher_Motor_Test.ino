@@ -26,8 +26,8 @@ void setup() {
   ledcSetup(2, 20000, 8);
   ledcSetup(3, 20000, 8);
   ledcSetup(4, 20000, 8);
-  ledcSetup(5, 20000, 8);
-  ledcSetup(6, 20000, 8);
+  ledcSetup(5, 50, 16);
+  ledcSetup(6, 50, 16);
 }
 
 void loop() {
