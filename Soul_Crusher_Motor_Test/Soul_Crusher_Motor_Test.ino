@@ -43,7 +43,7 @@ void loop() {
   }*/
 }
 
-long DDP(int deg) { //degrees to PWM
+int DDP(int deg) { //degrees to PWM
   const long minDutyCycle = 1675;            // duty cycle for 0 degrees
   const long maxDutyCycle = 8050;            // duty cycle for 180 degrees
 
