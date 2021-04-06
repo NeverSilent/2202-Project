@@ -321,7 +321,8 @@ void loop()
                   
             case 7:
             {
-
+             CR1_ciMotorRunTime = 3000; //set the time allocated for each case to 12 sec
+             
              //stop the drum
              ledcWrite(10, 0);
              ledcWrite(11, 0);
