@@ -13,11 +13,11 @@ void setup() {
   Serial.begin(9600);
   
   // put your setup code here, to run once:
-  ledcAttachPin(yellowLeft, 1);
-  ledcAttachPin(yellowRight, 2);
+  ledcAttachPin(yellowLeft, 1); //10
+  ledcAttachPin(yellowRight, 2); //11
 
-  ledcAttachPin(servoLeft, 5);
-  ledcAttachPin(servoRight, 6);
+  ledcAttachPin(servoLeft, 5);   //12
+  ledcAttachPin(servoRight, 6);  //13
   
   ledcSetup(1, 20000, 8);
   ledcSetup(2, 20000, 8);

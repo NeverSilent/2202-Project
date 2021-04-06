@@ -1,6 +1,9 @@
 /*
  Western Engineering base code
 2020 05 13 E J Porter
+2021 04 06 JD Herlehy
++ speed adjust for both drive motors
+++ moved the required variable from the encoder library
 
  Dual Motor driver controller implement
   

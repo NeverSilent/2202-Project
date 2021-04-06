@@ -1,66 +1,41 @@
-
-//MSE 2202 
-//Western Engineering base code
-//2020 05 13 E J Porter
-
-
-/*
-  esp32                                           MSE-DuinoV2
-  pins         description                        Brd Jumpers /Labels                                                                  User (Fill in chart with user PIN usage) 
-  1             3v3                               PWR 3V3                                                                              3V3
-  2             gnd                               GND                                                                                  GND
-  3             GPIO15/AD2_3/T3/SD_CMD/           D15 (has connections in both 5V and 3V areas)                    
-  4             GPIO2/AD2_2/T2/SD_D0              D2(has connections in both 5V and 3V areas)  /INDICATORLED ( On ESP32 board )        Heartbeat LED
-  5             GPIO4/AD2_0/T0/SD_D1              D4(has connections in both 5V and 3V areas)                                          Left Motor, Channel A
-  6             GPIO16/RX2                        Slide Switch S1b                                                                     IR Receiver
-  7             GPIO17/TX2                        Slide Switch S2b                                                                     Left Encoder, Channel A
-  8             GPIO5                             D5 (has connections in both 5V and 3V areas)                                         Left Encoder, Channel B
-  9             GPIO18                            D18 (has connections in both 5V and 3V areas)                                        Left Motor, Channel B
-  10            GPIO19/CTS0                       D19 (has connections in both 5V and 3V areas)                                        Right Motor, Channel A
-  11            GPIO21                            D21/I2C_DA  
-  12            GPIO3/RX0                         RX0
-  13            GPIO1//TX0                        TX0
-  14            GPIO22/RTS1                       D22/I2C_CLK
-  15            GPIO23                            D23 (has connections in both 5V and 3V areas)  
-  16            EN                                JP4 (Labeled - RST) for reseting ESP32
-  17            GPI36/VP/AD1_0                    AD0                   
-  18            GPI39/VN/AD1_3/                   AD3
-  19            GPI34/AD1_6/                      AD6
-  20            GPI35/AD1_7                       Potentiometer R2 / AD7
-  21            GPIO32/AD1_4/T9                   Potentiometer R1 / AD4                                                               Pot 1 (R1)
-  22            GPIO33/AD1_5/T8                   IMon/D33  monitor board current
-  23            GPIO25/AD2_8/DAC1                 SK6812 Smart LEDs / D25                                                              Smart LEDs
-  24            GPIO26/A2_9/DAC2                  Push Button PB2                                                                      Limit switch
-  25            GPIO27/AD2_7/T7                   Push Button PB1                                                                      PB1
-  26            GPOP14/AD2_6/T6/SD_CLK            Slide Switch S2a                                                                     Right Encoder, Channel A
-  27            GPIO12/AD2_5/T5/SD_D2/            D12(has connections in both 5V and 3V areas)                                         Right Motor, Channel B
-  28            GPIO13/AD2_4/T4/SD_D3/            Slide Switch S1a                                                                     Right Encoder, Channel B
-  29            GND                               GND                                                                                  GND
-  30            VIN                               PWR 5V t 7V                                                                          PWR 5V to 7V
+/*MSE 2202 
+ * 
+ * Western Engineering base code
+ * 2020 05 13 E J Porter
+ * 2021 04 06 JD Herlehy
+ * + servos for the arm
+ * + yellow motors for lifting the bot
+ * + cases for driving around obstacale
+ * + cases for checking if the IR was found
+ * /// changed the const int to a define statment == less memory in the bot
 */
 
 
 //Pin assignments
-const int ciHeartbeatLED = 2;
-const int ciPB1 = 27;     
-const int ciPB2 = 26;      
-const int ciPot1 = A4;    //GPIO 32  - when JP2 has jumper installed Analog pin AD4 is connected to Poteniometer R1
-const int ciPot2 = A7;
-const int ciLimitSwitch = 26;
-const int ciIRDetector = 16;
-const int ciMotorLeftA = 4;
-const int ciMotorLeftB = 18;
-const int ciMotorRightA = 19;
-const int ciMotorRightB = 12;
-const int ciEncoderLeftA = 17;
-const int ciEncoderLeftB = 5;
-const int ciEncoderRightA = 14;
-const int ciEncoderRightB = 13;
-const int ciSmartLED = 25;
-/*
-const int ciStepperMotorDir = 22;
-const int ciStepperMotorStep = 21;
-*/
+#define ciHeartbeatLED 2
+#define ciPB1 27     
+#define ciPB2 26      
+#define ciPot1 A4    //GPIO 32  - when JP2 has jumper installed Analog pin AD4 is connected to Poteniometer R1
+#define ciPot2 A7
+#define ciLimitSwitch 26
+#define ciIRDetector 16
+#define ciMotorLeftA 4
+#define ciMotorLeftB 18
+#define ciMotorRightA 19
+#define ciMotorRightB 12
+#define ciEncoderLeftA 17
+#define ciEncoderLeftB 5
+#define ciEncoderRightA 14
+#define ciEncoderRightB 13
+#define ciSmartLED 25
+
+#define servoLeft 25
+#define servoRight 23
+
+#define yellowLeft 21 //Sda
+#define yellowRight 22 //Sclk
+
+//for the encoders
 volatile uint32_t vui32test1;
 volatile uint32_t vui32test2;
 
@@ -79,12 +54,9 @@ void loopWEBServerButtonresponce(void);
 
 const int CR1_ciMainTimer = 1000;
 const int CR1_ciHeartbeatInterval = 500;
-int CR1_ciMotorRunTime = 600; //not const anymore so I can play around with it.
+int CR1_ciMotorRunTime = 600;             //not const anymore so I can play around with it.
 const long CR1_clDebounceDelay = 50;
 const long CR1_clReadTimeout = 220;
-
-const uint8_t ci8RightTurn = 30; //90 degree turns
-const uint8_t ci8LeftTurn = 30;
 
 unsigned char CR1_ucMainTimerCaseCore1;
 uint8_t CR1_ui8LimitSwitch;
@@ -113,6 +85,9 @@ unsigned char beaconHit = 0;
 unsigned char correction = 0;
 unsigned char reverseSet = 0;
 
+int WheelSpeed;
+int ServoPos;
+
 unsigned long CR1_ulHeartbeatTimerPrevious;
 unsigned long CR1_ulHeartbeatTimerNow;
 
@@ -121,29 +96,6 @@ boolean btRun = false;
 boolean btToggle = true;
 int iButtonState;
 int iLastButtonState = HIGH;
-
-//first stepper motor
-//unsigned long prevMicrosec1 = 0;               // start time for delay cycle, in milliseconds
-//unsigned long currMicrosec1 = 0;                // current time, in milliseconds
-//unsigned long stepCount1 = 0;                  // number of steps
-//unsigned long stepRate1 = 0;                       // step rate in microseconds  
-const int Gear1 = 21;              //SDA 
-const int Gear2 = 22;              //SCLK
-//boolean directionHold1 = true;
-//boolean raiseFlag1 = false;
-//boolean lowerFlag1 = false;
-
-/*second stepper motor
-unsigned long prevMicrosec2 = 0;               // start time for delay cycle, in milliseconds
-unsigned long currMicrosec2 = 0;                // current time, in milliseconds
-unsigned long stepCount2 = 0;                  // number of steps
-unsigned long stepRate2 = 0;                       // step rate in microseconds  
-const int dirPin2 = 15; // silk 15 
-const int stepPin2 = 23; // silk 23
-boolean directionHold2 = true;
-boolean raiseFlag2 = false;
-boolean lowerFlag2 = false;
-*/
 
 // Declare our SK6812 SMART LED object:
 Adafruit_NeoPixel SmartLEDs(2, 25, NEO_GRB + NEO_KHZ400);
@@ -183,22 +135,18 @@ void setup() {
    pinMode(ciPB1, INPUT_PULLUP);
    pinMode(ciLimitSwitch, INPUT_PULLUP);
 
-   //set the pind to output the planataries
-   pinMode(Gear1, OUTPUT);
-   pinMode(Gear2, OUTPUT);
 
-   ledcAttachPin(Gear1, 10);         // Assign servo pin to servo channel
-   ledcSetup(10, 21000, 8);          // setup for channel for 21000 Hz, 8-bit resolution
+   // put your setup code here, to run once:
+   ledcAttachPin(yellowLeft, 10);
+   ledcAttachPin(yellowRight, 11);
 
-   ledcAttachPin(Gear2, 11);         // Assign servo pin to servo channel
-   ledcSetup(11, 21000, 8);          // setup for channel for 21000 Hz, 8-bit resolution
-
-   //second motor
-   //pinMode(dirPin2, OUTPUT);
-   //pinMode(stepPin2, OUTPUT);
-
-   //ledcAttachPin(stepPin2, 11);     // Assign servo pin to servo channel
-   //ledcSetup(11, 589, 8);          // setup for channel for 589 Hz, 8-bit resolution
+   ledcAttachPin(servoLeft, 12);
+   ledcAttachPin(servoRight, 13);
+  
+   ledcSetup(10, 20000, 8);
+   ledcSetup(11, 20000, 8);
+   ledcSetup(12, 50, 16);
+   ledcSetup(13, 50, 16);
 
    SmartLEDs.begin();                          // Initialize Smart LEDs object (required)
    SmartLEDs.clear();                          // Set all pixel colours to off
@@ -329,31 +277,18 @@ void loop()
             ucMotorStateIndex = 5;
             break;
           }
-         
-          /*case 5:
-          {
-            ENC_SetDistance(455, 455); //go forward a bit
-            ucMotorState = 1; //forward
-            CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed+6;
-            CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
-            ucMotorStateIndex = 6;
-            break;
-          }*/
-
           
           case 5:
           {
             CR1_ciMotorRunTime = 400; //set the time allocated for each case to 300 mili sec
             if(CR1_ui8IRDatum == 0x55){
-              ENC_SetDistance(95, 95); //135 for 1 foot, 3 feet to a meter, x 2 meters + a bit for caution
-              //^^^ doesn't actually matter if the correction step is called
+              ENC_SetDistance(95, 95); //go forward a bit if the IR has been seen
               //shortened straight time for 700ms runs
               ucMotorState = 1;   //forward
               CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
               CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed; 
             } else if((CR1_ui8IRDatum != 0x55)&&(CR1_ui8IRDatum != 0x41)){
-              ENC_SetDistance(4, -4); //turn a bit more than 360 degrees, for correcting path
-              //changed to 15 degrees for shorter run times and adjustment
+              ENC_SetDistance(4, -4); //turn a small amount to the left if the IR isn't foun
               ucMotorState = 2; //left
               CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
               CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -361,21 +296,24 @@ void loop()
             break;
           }
 
-         //case 6 to 7 to run the steppers up the rope
+         //case 6 to 7 to run the robot up the rope
           case 6:
           {
-              
+            CR1_ciMotorRunTime = 12000; //set the time allocated for each case to 12 sec
+            
+             //stop the drive motors
              ledcWrite(2,255);
              ledcWrite(1,255);
              ledcWrite(4,255);
              ledcWrite(3,255);
-             CR1_ciMotorRunTime = 120000; //set the time allocated for each case to 2 sec
 
-             //digitalWrite(dirPin1, 1);
-             ledcWrite(10, 255);  
-             
-             //digitalWrite(dirPin2, 0);
-             ledcWrite(11, 255);   
+             //engage the arm //11 is the up position, 88 is the down I think
+             ledcWrite(12, DDP(11));  
+             ledcWrite(13, DDP(90 - 11)); 
+
+             //run the drum
+             ledcWrite(10, 255);
+             ledcWrite(11, 255);
              
              ucMotorStateIndex = 7;
              break;
@@ -383,12 +321,23 @@ void loop()
                   
             case 7:
             {
-             
-             ledcWrite(10, 0);
 
+             //stop the drum
+             ledcWrite(10, 0);
              ledcWrite(11, 0);
 
-            
+             ucMotorStateIndex = 8;
+             break;
+            }
+
+            case 8:
+            {
+
+             //lower the arm
+             ledcWrite(12, DDP(88));
+             ledcWrite(13, DDP(90 - 88));
+
+             
              break;
             }
 
@@ -404,7 +353,7 @@ void loop()
       //read pot 1 for motor speeds 
       CR1_ui8WheelSpeed = map(analogRead(ciPot1), 0, 4096, 130, 255);
 
-      CR1_ui8Adjuster = map(analogRead(ciPot2), 0, 4096, 0, 100);
+      CR1_ui8Adjuster = map(analogRead(ciPot2), 0, 4096, 0, 100); //how much the speed gets put to the left and the right
       
       CR1_ucMainTimerCaseCore1 = 2;
       break;
@@ -502,50 +451,11 @@ void loop()
  }
 }
 
- /* for precise timeing thaat isn't needed
- if(raiseFlag1 == true){
-      digitalWrite(dirPin1, directionHold1);
-      currMicrosec1 = micros();                      // get the current time in milliseconds
-        
-          if (currMicrosec1 - prevMicrosec1 > 300) { // check to see if elapsed time matched the desired delay
-          prevMicrosec1 = currMicrosec1;           
-          stepCount1++;
-          digitalWrite(stepPin1, stepCount1 & 1);  // toggle step pin (0 if stepCount is even, 1 if stepCount is odd)
-          }     
-        
- }
- if(lowerFlag1 == true){
-      digitalWrite(dirPin1, !(directionHold1)); 
-      currMicrosec = micros();                      // get the current time in milliseconds
-        
-          if (currMicrosec1 - prevMicrosec1 > 300) { // check to see if elapsed time matched the desired delay
-          prevMicrosec1 = currMicrosec1;           
-          stepCount1++;
-          digitalWrite(stepPin1, stepCount1 & 1);  // toggle step pin (0 if stepCount is even, 1 if stepCount is odd)
-          }  
-      }
-}
+int DDP(int deg) { //degrees to PWM
+  const long minDutyCycle = 1675;            // duty cycle for 0 degrees
+  const long maxDutyCycle = 8050;            // duty cycle for 180 degrees
 
-if(raiseFlag2 == true){
-      digitalWrite(dirPin2, directionHold2);
-      currMicrosec2 = micros();                      // get the current time in milliseconds
-        
-          if (currMicrosec2 - prevMicrosec2 > 300) { // check to see if elapsed time matched the desired delay
-          prevMicrosec2 = currMicrosec2;           
-          stepCount2++;
-          digitalWrite(stepPin2, stepCount2 & 1);  // toggle step pin (0 if stepCount is even, 1 if stepCount is odd)
-          }     
-        
- }
- if(lowerFlag2 == true){
-      digitalWrite(dirPin2, !(directionHold2)); 
-      currMicrosec = micros();                      // get the current time in milliseconds
-        
-          if (currMicrosec2 - prevMicrosec2 > 300) { // check to see if elapsed time matched the desired delay
-          prevMicrosec2 = currMicrosec2;           
-          stepCount2++;
-          digitalWrite(stepPin2, stepCount2 & 1);  // toggle step pin (0 if stepCount is even, 1 if stepCount is odd)
-          }  
-      }
+  long dutyCycle = map(deg, 0, 180, minDutyCycle, maxDutyCycle);  // convert to duty cycle
+
+  return dutyCycle;
 }
-*/
