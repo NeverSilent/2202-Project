@@ -240,7 +240,7 @@ void loop()
           case 1:
           {
             CR1_ciMotorRunTime = 2000; //set the time allocated for each case to 2 sec
-            ENC_SetDistance(177, 177); //go forward a bit
+            ENC_SetDistance(210, 210); //go forward a bit
             ucMotorState = 1; //forward
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -250,7 +250,7 @@ void loop()
           
           case 2:
           {
-            ENC_SetDistance(33, -33); //go left a bit
+            ENC_SetDistance(40, -40); //go left a bit
             ucMotorState = 2; //left
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -260,7 +260,7 @@ void loop()
           
           case 3:
           {
-            ENC_SetDistance(318, 318); //go forward a bit
+            ENC_SetDistance(315, 315); //go forward a bit
             ucMotorState = 1; //forward
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -270,7 +270,7 @@ void loop()
 
           case 4:
           {
-            ENC_SetDistance(26, -26); //go left a bit
+            ENC_SetDistance(34, -34); //go left a bit
             ucMotorState = 2; //left
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -280,7 +280,7 @@ void loop()
           
           case 5:
           {
-            CR1_ciMotorRunTime = 400; //set the time allocated for each case to 300 mili sec
+           CR1_ciMotorRunTime = 400; //set the time allocated for each case to 300 mili sec
             if(CR1_ui8IRDatum == 0x55){
               ENC_SetDistance(95, 95); //go forward a bit if the IR has been seen
               //shortened straight time for 700ms runs
@@ -288,18 +288,27 @@ void loop()
               CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
               CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed; 
             } else if((CR1_ui8IRDatum != 0x55)&&(CR1_ui8IRDatum != 0x41)){
-              ENC_SetDistance(4, -4); //turn a small amount to the left if the IR isn't foun
+              ENC_SetDistance(8, -8); //turn a small amount to the left if the IR isn't foun
               ucMotorState = 2; //left
               CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
               CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
             }
             break;
+             
+            //take out the IR search, replace with a 90 degree turn
+/*
+            ENC_SetDistance(220, 220); //go forward a bit
+            ucMotorState = 1; //forward
+            CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
+            CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
+            ucMotorStateIndex = 6;
+            break;
+  */
           }
-
-         //case 6 to 7 to run the robot up the rope
+          
           case 6:
           {
-            CR1_ciMotorRunTime = 12000; //set the time allocated for each case to 12 sec
+            CR1_ciMotorRunTime = 3000; //set the time allocated for each case to 3 sec
             
              //stop the drive motors
              ledcWrite(2,255);
@@ -310,28 +319,35 @@ void loop()
              //engage the arm //11 is the up position, 88 is the down I think
              ledcWrite(12, DDP(11));  
              ledcWrite(13, DDP(90 - 11)); 
-
+             ucMotorStateIndex = 7;
+             break;
+          }
+          
+         //case 7 to 8 to run the robot up the rope
+          case 7:
+          {
+            CR1_ciMotorRunTime = 22000; //set the time allocated for each case to 22 sec
              //run the drum
              ledcWrite(10, 255);
              ledcWrite(11, 255);
              
-             ucMotorStateIndex = 7;
+             ucMotorStateIndex = 8;
              break;
             }
                   
-            case 7:
+            case 8:
             {
-             CR1_ciMotorRunTime = 3000; //set the time allocated for each case to 12 sec
+             CR1_ciMotorRunTime = 3000; //set the time allocated for each case to 3 sec
              
              //stop the drum
              ledcWrite(10, 0);
              ledcWrite(11, 0);
 
-             ucMotorStateIndex = 8;
+             ucMotorStateIndex = 9;
              break;
             }
 
-            case 8:
+            case 9:
             {
 
              //lower the arm
@@ -375,7 +391,7 @@ void loop()
       if(ENC_ISMotorRunning())
       {
         //RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster)
-        MoveTo(ucMotorState, LeftAdjust(CR1_ui8LeftWheelSpeed, CR1_ui8Adjuster) , RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster) + 17);
+        MoveTo(ucMotorState, LeftAdjust(CR1_ui8LeftWheelSpeed, CR1_ui8Adjuster) - 28 , RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster) + 23);
       } 
    
       CR1_ucMainTimerCaseCore1 = 4;
@@ -409,7 +425,8 @@ void loop()
        }
        else if (CR1_ui8IRDatum == 0x41) {           // if "hit" character is seen
          SmartLEDs.setPixelColor(0,25,0,25);        // make LED1 purple with 10% intensity
-         if(reverseSet == 0){
+         // only when IR was in
+          if(reverseSet == 0){
           ucMotorStateIndex = 6; //start to climb
           reverseSet = 1;
          }
