@@ -8,6 +8,7 @@
  * + cases for driving around obstacale
  * + cases for checking if the IR was found
  * /// changed the const int to a define statment == less memory in the bot
+ * + Added the parts that would need to be calibrated per robot
 */
 
 
@@ -54,7 +55,7 @@ void loopWEBServerButtonresponce(void);
 
 const int CR1_ciMainTimer = 1000;
 const int CR1_ciHeartbeatInterval = 500;
-int CR1_ciMotorRunTime = 600;             //not const anymore so I can play around with it.
+int CR1_ciMotorRunTime = 600;               //not const anymore since being able to change the timing provves useful
 const long CR1_clDebounceDelay = 50;
 const long CR1_clReadTimeout = 220;
 
@@ -83,10 +84,7 @@ unsigned long CR1_ulMotorTimerNow;
 unsigned char ucMotorStateIndex = 0;
 unsigned char beaconHit = 0;
 unsigned char correction = 0;
-unsigned char reverseSet = 0;
-
-int WheelSpeed;
-int ServoPos;
+unsigned char reverseSet = 0;                       ///To Know if the IR Beacon was hit or not, so the sequencing only runs once
 
 unsigned long CR1_ulHeartbeatTimerPrevious;
 unsigned long CR1_ulHeartbeatTimerNow;
@@ -236,11 +234,10 @@ void loop()
             break;
           }
 
-          //cae 1 to 5 is the course around the obstacle
-          case 1:
+          case 1:       /// first straight away
           {
             CR1_ciMotorRunTime = 2000; //set the time allocated for each case to 2 sec
-            ENC_SetDistance(185, 185); //go forward a bit
+            ENC_SetDistance(175, 175); //go forward a bit
             ucMotorState = 1; //forward
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -248,19 +245,19 @@ void loop()
             break;
           }
           
-          case 2:
+          case 2:       /// first left turn
           {
-            ENC_SetDistance(-20, 20); //go left a bit
-            ucMotorState = 2; //left
+            ENC_SetDistance(29, -29); //go left a bit                           /// Change the angle per robot
+            ucMotorState = 2; //left                                            
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
             ucMotorStateIndex = 3;
             break;
           }
           
-          case 3:
+          case 3:       /// second straight away
           {
-            ENC_SetDistance(248, 248); //go forward a bit
+            ENC_SetDistance(240, 240); //go forward a bit
             ucMotorState = 1; //forward
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
@@ -268,45 +265,34 @@ void loop()
             break;
           }
           
-          case 5:
+          case 5:       /// slow increments up third straight away inorder to hit the IR Beacon
           {
-           CR1_ciMotorRunTime = 1000; //set the time allocated for each case to 300 mili sec
+           CR1_ciMotorRunTime = 1000; //set the time allocated for each case to 1 sec
             if(CR1_ui8IRDatum == 0x55){
-              ENC_SetDistance(35, 35); //go forward a bit if the IR has been seen
-              //shortened straight time for 700ms runs
+              ENC_SetDistance(40, 40); //go forward a bit if the IR has been seen
               ucMotorState = 1;   //forward
               CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
               CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed; 
-            } else if((CR1_ui8IRDatum != 0x55)&&(CR1_ui8IRDatum != 0x41)){
-              ENC_SetDistance(-4, 4); //turn a small amount to the left if the IR isn't found
-              ucMotorState = 2; //right
+            } else if((CR1_ui8IRDatum != 0x55)&&(CR1_ui8IRDatum != 0x41)){ //if the green isn't seen (beacon is red)
+              ENC_SetDistance(3, -3); //turn a small amount to the left if the IR isn't found
+              ucMotorState = 2; //left
               CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
               CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
-            }
+            } //turning left results in a full circle, but if bot vears to the left while going straight, switch to turn right a little
             break;
-             
-            //take out the IR search, replace with a 90 degree turn
-/*
-            ENC_SetDistance(220, 220); //go forward a bit
-            ucMotorState = 1; //forward
-            CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
-            CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
-            ucMotorStateIndex = 6;
-            break;
-  */
           }
 
-          case 6:
+          case 6: //back up a little to give space for drum 1 to close on the rope
           {
-            ENC_SetDistance(8, 8); //go forward a bit
-            ucMotorState = 4; //forward
+            ENC_SetDistance(5, 5); //reverse a bit
+            ucMotorState = 4; //reverse
             CR1_ui8LeftWheelSpeed = CR1_ui8WheelSpeed;
             CR1_ui8RightWheelSpeed = CR1_ui8WheelSpeed;
             ucMotorStateIndex = 7;
             break;
           }
           
-          case 7:
+          case 7: //full brake the drive motors, close drum 1 via arm
           {
             CR1_ciMotorRunTime = 3000; //set the time allocated for each case to 3 sec
             
@@ -317,14 +303,13 @@ void loop()
              ledcWrite(3,255);
 
              //engage the arm //11 is the up position, 88 is the down I think
-             ledcWrite(12, DDP(11));  
-             ledcWrite(13, DDP(90 - 11)); 
+             ledcWrite(12, DDP(88));  
+             ledcWrite(13, DDP(90 - 88)); 
              ucMotorStateIndex = 8;
              break;
           }
           
-         //case 7 to 8 to run the robot up the rope
-          case 8:
+         case 8: //Spin up the drum, to climb the rope
           {
             CR1_ciMotorRunTime = 22000; //set the time allocated for each case to 22 sec
              //run the drum
@@ -335,7 +320,7 @@ void loop()
              break;
             }
                   
-            case 9:
+            case 9: //stop the drum
             {
              CR1_ciMotorRunTime = 3000; //set the time allocated for each case to 3 sec
              
@@ -347,12 +332,12 @@ void loop()
              break;
             }
 
-            case 10:
+            case 10: //lower the arm
             {
 
              //lower the arm
-             ledcWrite(12, DDP(88));
-             ledcWrite(13, DDP(90 - 88));
+             ledcWrite(12, DDP(11));
+             ledcWrite(13, DDP(90 - 11));
 
              
              break;
@@ -391,7 +376,8 @@ void loop()
       if(ENC_ISMotorRunning())
       {
         //RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster)
-        MoveTo(ucMotorState, LeftAdjust(CR1_ui8LeftWheelSpeed, CR1_ui8Adjuster) - 28 , RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster) + 23);
+        //Check the Motion Library for the added Functions(LeftAdjuct, RightAdjust)
+        MoveTo(ucMotorState, LeftAdjust(CR1_ui8LeftWheelSpeed, CR1_ui8Adjuster) + 12, RightAdjust(CR1_ui8RightWheelSpeed, CR1_ui8Adjuster) - 42); //older, 12,42 //new 0,12
       } 
    
       CR1_ucMainTimerCaseCore1 = 4;
