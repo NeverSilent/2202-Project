@@ -418,7 +418,8 @@ void loop()
          }
        }
        else {                                       // otherwise
-         SmartLEDs.setPixelColor(0,25,0,0);         // make LED1 red with 10% intensity
+         SmartLEDs.setPixelColor(0,255,255,255);         // make LED1 red with 10% intensity
+         SmartLEDs.setPixelColor(1,255,255,255);
        }
        SmartLEDs.show();                            // send updated colour to LEDs
           
